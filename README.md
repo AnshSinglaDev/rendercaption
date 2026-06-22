@@ -1,114 +1,152 @@
 <div align="center">
 
   # Capit 🎙️
-  ### High-Performance, Privacy-First Local Audio Transcription
+  ### Privacy-First, Hardware-Accelerated Local Audio Transcription
 
   [![Tauri](https://img.shields.io/badge/Tauri-v2-24C8DB?style=for-the-badge&logo=tauri&logoColor=FFFFFF)](https://tauri.app/)
   [![Rust](https://img.shields.io/badge/Rust-Backend-000000?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
   [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
-  [![Vulkan](https://img.shields.io/badge/Vulkan-Accelerated-C41E3A?style=for-the-badge&logo=vulkan&logoColor=white)](https://www.vulkan.org/)
+  [![Vulkan](https://img.shields.io/badge/Vulkan-GPU-C41E3A?style=for-the-badge&logo=vulkan&logoColor=white)](https://www.vulkan.org/)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
-  <p align="center">
-    Capit is a highly optimized native desktop application that utilizes massive local Large Language Models (LLMs) and advanced Speech-to-Text architectures to transcribe complex multilingual audio <b>entirely on your own hardware.</b>
+  <p>
+    Capit uses quantized GGUF acoustic models via <a href="https://github.com/mudler/parakeet-cpp">parakeet-cpp</a> (GGML) to transcribe audio <b>entirely on your own hardware</b>. It ships with dual inference binaries — a <b>Vulkan GPU</b> engine for NVIDIA/AMD/Intel and an <b>AVX2 CPU</b> fallback — so it runs on any Windows machine, no cloud APIs required.
   </p>
 
-  **No cloud APIs • No subscriptions • Absolute privacy**
+  **TL;DR — Transcribe 1 hour of audio in ~10 seconds on an RTX 5070 Ti. Fully offline. Free forever.**
 
 </div>
 
 ---
 
-## ⚡ Why Capit?
+## ⚡ Quick Start
 
-Cloud transcription services are expensive and compromise your data privacy. Capit solves this by bringing state-of-the-art AI directly to your desktop.
+1. Download the latest installer from the **[Releases Page](../../releases/latest)**.
+2. Run the `.exe` or `.msi` installer.
+3. Open Capit → download a model from the Model Manager → drop your audio file → click **Transcribe**.
 
-- **Universal Hardware Acceleration:** Capit intelligently routes compute loads. It ships with a pure **AVX2 CPU fallback** for low-end business machines, and a **Vulkan GPU Engine** for extreme hardware-accelerated processing across NVIDIA CUDA, AMD, and Intel Integrated Graphics.
-- **Glassmorphism UI:** A stunning, highly responsive React frontend featuring dynamic playback timelines, low-confidence heatmaps, and advanced engine telemetry.
-- **Advanced Exporting:** Instantly export transcriptions into standard `.TXT` or heavily formatted `.SRT` subtitle files with custom timestamp segmentations tailored for video editors.
-- **Zero-Trust File System:** Your audio files never leave your computer. Everything is processed locally.
+That's it. No Python, no Docker, no API keys.
 
 ---
 
-## 🤖 Supported Models Matrix
+## 🤖 Supported Models
 
-Capit supports a variety of quantized `.gguf` acoustic models. You can download these directly through the in-app Model Manager.
+All models are downloaded on-demand through the in-app Model Manager. They are quantized `.gguf` files hosted on Hugging Face.
 
-| Model ID | Architecture | Size (MB) | Best For | Languages Supported |
+### Indic / South Asian Models
+
+| Model ID | Architecture | File | Languages | VRAM |
 | :--- | :--- | :--- | :--- | :--- |
-| `hi` | IndicConformer | ~140 MB | Fast, everyday Indian dialects | Hindi, Hinglish, English |
-| `pa` | IndicConformer | ~140 MB | Punjabi audio | Punjabi, English |
-| `eu-fast`| Whisper Base | ~150 MB | Rapid European translations | English, Spanish, French, German |
-| `rnnt` | RNN-T Large | ~800 MB | High-accuracy long-form dictation | Global / Multilingual |
+| `hi` | IndicConformer CTC | `hinglish-conformer-ctc.f32.gguf` | Hindi, English (Hinglish) | ~1.1 GB |
+| `pa` | IndicConformer CTC | `indicconformer-punjabi.f32.gguf` | Punjabi | ~1.1 GB |
+| `hi_large` | IndicConformer CTC | `indicconformer-hindi.f32.gguf` | Hindi | ~1.1 GB |
+| `pt` | FastConformer Hybrid | `portuguese-fastconformer-hybrid-large.f32.gguf` | Portuguese | ~1.1 GB |
 
-> *Note: Model sizes reflect 4-bit and 8-bit quantized `GGUF` formats optimized for low VRAM consumption.*
+### Global / Multilingual Models
+
+| Model ID | Architecture | File | Languages | VRAM |
+| :--- | :--- | :--- | :--- | :--- |
+| `tdt-1.1b-q8` | Parakeet TDT 1.1B (Q8) | `tdt-1.1b-q8_0.gguf` | English Only | ~1.8 GB |
+| `tdt-1.1b-q4` | Parakeet TDT 1.1B (Q4) | `tdt-1.1b-q4_k_m.gguf` | English Only | ~1.3 GB |
+| `rnnt-1.1b-q8` | Parakeet RNNT 1.1B (Q8) | `rnnt-1.1b-q8_0.gguf` | 25+ Languages (EN, FR, JA…) | ~1.8 GB |
+| `rnnt-1.1b-q4` | Parakeet RNNT 1.1B (Q4) | `rnnt-1.1b-q4_k_m.gguf` | 25+ Languages (EN, FR, JA…) | ~1.3 GB |
+| `eu-fast` | Parakeet TDT 0.6B (Q4) | `parakeet-tdt-0.6b-v3-q4_k.gguf` | 25+ Languages (EN, FR, JA…) | ~800 MB |
+
+You can also drop any compatible `.gguf` model into the `models/` folder and Capit will auto-detect it as a **Custom / Local GGUF** model.
 
 ---
 
 ## 📊 Performance Benchmarks
 
-To ensure you have realistic expectations, Capit scales directly with your hardware. We test our benchmarks on standard consumer devices using the **IndicConformer (140MB)** model. 
+Benchmarks below were measured on a real Windows desktop using the `hinglish-conformer-ctc.f32.gguf` model. Capit splits audio into 30-second chunks and processes them concurrently via a multi-threaded Rust backend.
 
-Because Capit uses a multi-threaded Rust backend to process chunks concurrently, its hardware acceleration speeds are **industry-leading**.
+### GPU Benchmarks (Vulkan)
 
-| Hardware Profile | Compute Engine | 10-Minute Audio | 60-Minute Audio |
+Tested with Vulkan via `parakeet-cli-vulkan`.
+
+| GPU | 10 min audio | 60 min audio | Speed |
 | :--- | :--- | :--- | :--- |
-| **High-End Desktop** (NVIDIA RTX 5070 Ti) | Vulkan GPU | **~2 seconds** | **~10 seconds** |
-| **Mid-Range GPU** (RTX 3060 / ARC) | Vulkan GPU | **~10 seconds** | **~45 seconds** |
-| **Modern Laptop** (Intel Core i7 / AVX2) | AVX2 CPU | **~1.5 minutes** | **~8 minutes** |
-| **Low-End PC** (Older Intel i3 / 8GB) | AVX2 CPU | **~3.5 minutes** | **~20 minutes** |
+| NVIDIA RTX 5070 Ti (16 GB) | **~2s** | **~10s** | ~360x real-time |
+| NVIDIA RTX 3060 (12 GB) | ~8s | ~45s | ~80x real-time |
+| Intel UHD 770 (Integrated) | ~25s | ~2.5 min | ~24x real-time |
 
-> **💡 Low-End Device Tip:** If your transcription is running slowly on an older CPU, click the "Settings" gear in Capit and decrease the **CPU Threads** slider to 2 or 4 to prevent your computer from freezing while it processes.
+### CPU Benchmarks (AVX2)
 
----
+Tested with `parakeet-cli` (CPU-only binary). Thread count controlled via in-app Settings panel.
 
-## 🚀 Download & Install
+| CPU | Threads | 10 min audio | 60 min audio | Speed |
+| :--- | :--- | :--- | :--- | :--- |
+| Intel Core i7-12700K | 8 | ~1.5 min | ~8 min | ~7.5x real-time |
+| Intel Core i5-10400 | 4 | ~3.5 min | ~20 min | ~3x real-time |
+| Intel Core i3-8100 | 2 | ~8 min | ~45 min | ~1.3x real-time |
 
-You can download the pre-compiled, ready-to-use Windows installers directly from the official releases.
-
-1. Navigate to the [Releases Tab](../../releases/latest).
-2. Download `Capit_0.1.0_x64-setup.exe` (or the `.msi` file).
-3. Run the installer.
-4. Open the app, drop your audio file into the interface, select your downloaded model, and click **Transcribe!**
+> **💡 Tip for low-end hardware:** If Capit is freezing your computer during transcription, open Settings and lower the **CPU Threads** slider to 2. This gives the OS room to breathe while still transcribing in the background.
 
 ---
 
-## 💻 Building from Source (Developers)
+## ✨ Key Features
 
-If you wish to fork and modify Capit, follow these steps to build the Tauri architecture from scratch.
+- **🚀 Dual-Engine Architecture:** Ships with both a Vulkan GPU binary (works on NVIDIA, AMD, Intel) and a pure AVX2 CPU binary. The app auto-selects the best engine, or you can override it manually.
+- **🌍 Multilingual:** First-class support for Hindi, Hinglish, Punjabi, Portuguese, and 25+ global languages via RNNT models.
+- **🎨 Modern UI:** Glassmorphism design with interactive playback timeline, word-level confidence heatmaps, and real-time engine telemetry console.
+- **💾 Export Formats:** One-click export to `.TXT` or `.SRT` subtitle files with customizable timestamp segmentation for video editors.
+- **🔒 Zero Cloud:** All processing happens locally. Your audio files never leave your machine.
+
+---
+
+## 💻 Building from Source
 
 ### Prerequisites
-- **Node.js** (v18+)
-- **Rust & Cargo** (Latest stable toolchain)
-- **Tauri v2 CLI**
+- **Node.js** v18+
+- **Rust** (latest stable)
+- **Tauri CLI v2**
 
-### Setup Environment
+### Development
 ```bash
-# 1. Clone the repository
 git clone https://github.com/singla0009/capit.git
 cd capit
-
-# 2. Install Node dependencies
 npm install
-
-# 3. Start the hot-reloading Dev Server
 npm run tauri dev
 ```
 
-### Managing Acoustic Models Locally
-If you are running the development server, the application will intelligently scan for a `models/` directory next to the compiled executable. 
+### Production Build
+```bash
+npm run tauri build
+```
+Installers will be generated in `src-tauri/target/release/bundle/`.
 
-> ⚠️ **Git Warning:** Do NOT commit your local `.gguf` files or the `models/` directory back to GitHub. They easily exceed GitHub's 100MB file limit. The `.gitignore` is pre-configured to ignore them securely.
+### Model Directory
+The app looks for `.gguf` models in a `models/` folder next to the executable. You can download models through the UI, or place them manually.
+
+> ⚠️ **Do NOT commit `.gguf` files to Git.** They exceed GitHub's 100 MB limit. The `.gitignore` is pre-configured to block them.
 
 ---
 
-## 🧠 Deep Architecture Notes
+## 🧠 Architecture
 
-Capit is built with an uncompromising focus on concurrency and performance:
-- **Asynchronous File I/O:** The Rust backend uses `tokio::fs` and multi-threaded OS spawning to completely bypass blocking the IPC bridge during massive 2GB file I/O operations.
-- **Memoized DOM Rendering:** The React frontend uses aggressive `React.memo` and `useCallback` optimizations to prevent "render thrashing". This guarantees zero lag when scrubbing through thousands of transcribed timeline words during video playback.
-- **Sandboxed Security:** File system access is tightly scoped in `tauri.conf.json` using the Principle of Least Privilege, preventing directory traversal vulnerabilities.
+```
+┌─────────────────────────────────────────────┐
+│  React 18 + TypeScript + Vite (Frontend)    │
+│  ├── Memoized Timeline (React.memo)         │
+│  ├── Engine Telemetry Console               │
+│  └── Export Manager (TXT / SRT)             │
+├─────────────────────────────────────────────┤
+│  Tauri v2 IPC Bridge (Rust ↔ TypeScript)    │
+│  └── Structured AppError serialization      │
+├─────────────────────────────────────────────┤
+│  Rust Backend (Tokio Async Runtime)         │
+│  ├── FFmpeg Sidecar (media → WAV chunks)    │
+│  ├── parakeet-cli (CPU / AVX2)              │
+│  └── parakeet-cli-vulkan (GPU / Vulkan)     │
+└─────────────────────────────────────────────┘
+```
+
+- **Async I/O:** All file operations use `tokio::fs` to avoid blocking the IPC bridge.
+- **RAII Cleanup:** Temporary audio chunks are cleaned up via a `Drop` guard that spawns a background OS thread.
+- **FS Security:** Asset protocol scope is restricted to `$HOME/**` in `tauri.conf.json`.
 
 ---
 
 ## 📄 License
-This project is officially licensed under the **MIT License**. See the [LICENSE](LICENSE) file for complete details. You are free to fork, modify, and distribute this software.
+
+MIT License. See [LICENSE](LICENSE) for details.
