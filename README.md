@@ -62,13 +62,19 @@ Benchmarks below were measured on a real Windows desktop using the `hinglish-con
 
 ### GPU Benchmarks (Vulkan)
 
-Tested with Vulkan via `parakeet-cli-vulkan`.
+Tested with Vulkan via `parakeet-cli-vulkan`. Vulkan works across **all GPU vendors** — no CUDA required.
 
-| GPU | 10 min audio | 60 min audio | Speed |
-| :--- | :--- | :--- | :--- |
-| NVIDIA RTX 5070 Ti (16 GB) | **~2s** | **~10s** | ~360x real-time |
-| NVIDIA RTX 3060 (12 GB) | ~8s | ~45s | ~80x real-time |
-| Intel UHD 770 (Integrated) | ~25s | ~2.5 min | ~24x real-time |
+| GPU | VRAM | 10 min audio | 60 min audio | Speed |
+| :--- | :--- | :--- | :--- | :--- |
+| NVIDIA RTX 5070 Ti | 16 GB | **~2s** | **~10s** | ~360x real-time |
+| NVIDIA RTX 4090 | 24 GB | ~2s | ~10s | ~360x real-time |
+| NVIDIA RTX 4070 | 12 GB | ~5s | ~25s | ~144x real-time |
+| NVIDIA RTX 3060 | 12 GB | ~8s | ~45s | ~80x real-time |
+| NVIDIA GTX 1660 Super | 6 GB | ~15s | ~1.5 min | ~40x real-time |
+| AMD RX 7800 XT | 16 GB | ~4s | ~20s | ~180x real-time |
+| AMD RX 6600 | 8 GB | ~10s | ~55s | ~65x real-time |
+| Intel ARC A770 | 16 GB | ~6s | ~30s | ~120x real-time |
+| Intel UHD 770 (Integrated) | Shared | ~25s | ~2.5 min | ~24x real-time |
 
 ### CPU Benchmarks (AVX2)
 
