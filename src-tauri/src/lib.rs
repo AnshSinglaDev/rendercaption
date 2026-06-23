@@ -533,7 +533,13 @@ async fn run_transcription(
     app.emit("transcription-log", format!("   Spawning {} parallel inference session(s)...", actual_workers)).unwrap_or(());
 
     let sidecar_name = if compute_method.contains("vulkan") { "parakeet-cli-vulkan" } else { "parakeet-cli" };
-    let decoder_type = if model_path_str.to_lowercase().contains("tdt") { "tdt" } else { "ctc" };
+    let decoder_type = if model_path_str.to_lowercase().contains("tdt") { 
+        "tdt" 
+    } else if model_path_str.to_lowercase().contains("rnnt") { 
+        "rnnt" 
+    } else { 
+        "ctc" 
+    };
     let lang_flag = if language != "auto" { language.clone() } else if model_id == "pa" { "pa".to_string() } else if model_id == "pt" { "pt".to_string() } else if model_id.contains("tdt") || model_id.contains("rnnt") || model_id == "eu-fast" { "en".to_string() } else { "hi".to_string() };
 
     ABORT_INFERENCE.store(false, Ordering::SeqCst);
