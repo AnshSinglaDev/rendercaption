@@ -52,8 +52,13 @@ function App() {
   const [cpuWorkers, setCpuWorkers] = useState(2);
   const [cpuThreads, setCpuThreads] = useState(2);
 
-  const refreshModels = () => {
-    invoke<ModelStatus>("check_models").then(setModelStatus).catch((e: any) => console.error("Model check failed:", e.message || String(e)));
+  const refreshModels = async () => {
+    try {
+      const status = await invoke<ModelStatus>("check_models");
+      setModelStatus(status);
+    } catch (e: any) {
+      console.error("Model check failed:", e.message || String(e));
+    }
   };
 
   useEffect(() => {
@@ -86,7 +91,7 @@ function App() {
     }
   };
 
-  const selectCustomModel = async () => {
+  const selectCustomModel = async (oldId: string) => {
     const selected = await open({
       multiple: false,
       filters: [{ name: "Model", extensions: ["gguf"] }],
@@ -97,20 +102,26 @@ function App() {
         const filename = await invoke<string>("import_custom_model", { filePath: selected });
         appLog(`[IMPORT] Successfully imported ${filename}!`);
         await refreshModels();
-        setSelectedModelId(filename);
+        setTimeout(() => {
+          setSelectedModelId(filename);
+        }, 100);
       } catch (e: any) {
         appLog(`[ERROR] Failed to import model: ${e.message || String(e)}`);
+        setSelectedModelId(oldId);
       }
+    } else {
+      setSelectedModelId(oldId);
     }
   };
 
   const downloadModel = async (modelId: string) => {
     setIsDownloading(true);
     setDownloadingModelId(modelId);
+    setSelectedModelId(modelId);
     clearLogs();
     try {
       await invoke("download_model", { modelId });
-      refreshModels();
+      await refreshModels();
     } catch (e: any) {
       appLog(`[ERROR] Download failed: ${e.message || String(e)}`);
     }
@@ -213,8 +224,16 @@ function App() {
           </div>
           
           <select className="pro-select" value={selectedModelId} onChange={(e) => {
-            if (e.target.value === "custom") selectCustomModel();
-            else setSelectedModelId(e.target.value);
+            const val = e.target.value;
+            if (val === "custom") {
+              const oldVal = selectedModelId;
+              // Temporarily set to custom to allow React to process the change event visually
+              setSelectedModelId("custom");
+              setTimeout(() => selectCustomModel(oldVal), 10);
+            }
+            else {
+              setSelectedModelId(val);
+            }
           }} disabled={isProcessing || isDownloading}>
             {modelStatus?.models.map(m => (
               <option key={m.id} value={m.id}>
