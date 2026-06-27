@@ -15,7 +15,7 @@
     RenderCaption is a <b>one-click install</b> desktop app that generates subtitles, captions, and transcriptions from any audio or video file — <b>entirely offline</b> on your own machine. It supports <b>25+ languages</b> including Hindi, Hinglish, Punjabi, English, French, Japanese, and more. Powered by local AI models via <a href="https://github.com/mudler/parakeet-cpp">parakeet-cpp</a> (GGML), with hardware acceleration across NVIDIA, AMD, and Intel GPUs.
   </p>
 
-  **TL;DR — Transcribe 1 hour of audio in ~10 seconds on an RTX 5070 Ti. Export to SRT subtitles instantly. No cloud, no API keys, free forever.**
+  **TL;DR — Transcribe 1 hour of audio in ~10 seconds on Graphic Cards. Export to SRT subtitles instantly. No cloud, no API keys, free forever.**
 
 </div>
 
