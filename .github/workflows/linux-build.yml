@@ -19,7 +19,7 @@ jobs:
 
       - name: Compile C++ Backend (Parakeet patched for AI4Bharat)
         run: |
-          git clone https://github.com/mudler/parakeet.cpp.git
+          git clone --recursive https://github.com/mudler/parakeet.cpp.git
           cd parakeet.cpp
           # Apply the architectural patch for Indic models (bypassing strict CPU assertions)
           sed -i 's/if (factor == 4)/if (true)/g' src/subsampling.cpp
