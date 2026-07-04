@@ -29,9 +29,13 @@ jobs:
 
       - name: Prepare Tauri Sidecars for Linux
         run: |
+          # Find the compiled parakeet-cli executable
+          CLI_PATH=$(find parakeet.cpp/build -name parakeet-cli -type f -executable | head -n 1)
+          echo "Found CLI at: $CLI_PATH"
+          
           cd src-tauri/bin
           # 1. Copy the compiled parakeet engine with the correct Linux target suffix
-          cp ../../../parakeet.cpp/build/bin/parakeet-cli parakeet-cli-x86_64-unknown-linux-gnu
+          cp "../../$CLI_PATH" parakeet-cli-x86_64-unknown-linux-gnu
           
           # 2. Mock the Vulkan CLI (not used by default on this action but required by tauri.conf)
           cp parakeet-cli-x86_64-unknown-linux-gnu parakeet-cli-vulkan-x86_64-unknown-linux-gnu
