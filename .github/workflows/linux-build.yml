@@ -25,7 +25,7 @@ jobs:
           git clone --recursive https://github.com/mudler/parakeet.cpp.git
           cd parakeet.cpp
           # Apply the architectural patch for Indic models (reshapes [KW, KH, C, 1] -> [KW, KH, 1, C])
-          sed -i '/ggml_tensor \*dww = clone_weight(ctx, ml, s.dw_w);/a \      if (dww->ne[2] > 1 && dww->ne[3] == 1) { dww = ggml_reshape_4d(ctx, dww, dww->ne[0], dww->ne[1], 1, dww->ne[2]); }' src/subsampling.cpp
+          sed -i '/clone_weight(ctx, ml, s.dw_w);/a \      if (dww->ne[2] > 1 && dww->ne[3] == 1) { dww = ggml_reshape_4d(ctx, dww, dww->ne[0], dww->ne[1], 1, dww->ne[2]); }' src/subsampling.cpp
           mkdir -p build && cd build
           cmake .. -DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS
           make -j$(nproc)
