@@ -12,8 +12,11 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y wget ffmpeg
 
       - name: Download AppImage v0.1.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          wget https://github.com/AnshSinglaDev/rendercaption/releases/download/v0.1.3/RenderCaption_0.1.3_amd64.AppImage
+          # Use gh to download since the release is currently a "Draft" and hidden from public wget
+          gh release download v0.1.3 --pattern "*.AppImage" --repo AnshSinglaDev/rendercaption || true
           chmod +x RenderCaption_0.1.3_amd64.AppImage
           ./RenderCaption_0.1.3_amd64.AppImage --appimage-extract
 
