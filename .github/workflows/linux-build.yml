@@ -1,7 +1,7 @@
 name: Build Linux AppImage
 on:
   push:
-    branches: [ main ]
+    branches: [ main, linux-fixes ]
   workflow_dispatch:
 
 permissions:
@@ -49,7 +49,8 @@ jobs:
           cp ffmpeg-*-amd64-static/ffmpeg ffmpeg-x86_64-unknown-linux-gnu
           chmod +x ffmpeg-x86_64-unknown-linux-gnu
 
-          # 4. Create dummy .dll files so Tauri doesn't crash when reading the 'resources' block
+          # 4. Remove 90MB of Windows DLLs and create dummy 0-byte .dll files so Tauri doesn't crash when reading the 'resources' block
+          rm -f ggml*.dll
           touch ggml.dll ggml-base.dll ggml-cpu.dll ggml-cuda.dll ggml-vulkan.dll
 
       - name: Setup Node.js

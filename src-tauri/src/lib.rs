@@ -28,42 +28,21 @@ impl Drop for TempDirGuard {
     }
 }
 
-// Resolve models directory: checks multiple locations, picks the first that has models
-fn get_models_dir(_app: &tauri::AppHandle) -> std::path::PathBuf {
-    // Check these directories in order
-    let candidates = vec![
-        // 1. Next to the app executable (production)
-        std::env::current_exe()
-            .ok()
-            .and_then(|p| p.parent().map(|d| d.join("models"))),
-        // 2. Project root /models during dev
-        std::env::current_dir().ok().map(|d| d.join("models")),
-    ];
+// Resolve models directory to a universally writable AppData location (fixes Linux AppImage read-only errors)
+fn get_models_dir(app: &tauri::AppHandle) -> std::path::PathBuf {
+    use tauri::Manager;
     
-    // Return the first directory that actually contains .gguf files
-    for candidate in &candidates {
-        if let Some(dir) = candidate {
-            if dir.exists() {
-                if let Ok(entries) = fs::read_dir(dir) {
-                    let has_models = entries
-                        .filter_map(Result::ok)
-                        .any(|e| e.path().extension().map_or(false, |ext| ext == "gguf"));
-                    if has_models {
-                        return dir.clone();
-                    }
-                }
-            }
-        }
+    // 1. Prefer Tauri's App Data Directory (works perfectly on Windows and Linux AppImages)
+    if let Ok(app_data) = app.path().app_data_dir() {
+        let models_dir = app_data.join("models");
+        let _ = fs::create_dir_all(&models_dir);
+        return models_dir;
     }
     
-    // Default: create models dir exactly where the app is installed
-    let default = std::env::current_exe()
-        .ok()
-        .and_then(|p| p.parent().map(|d| d.join("models")))
-        .unwrap_or_else(|| std::env::current_dir().unwrap_or_default().join("models"));
-        
-    let _ = fs::create_dir_all(&default);
-    default
+    // 2. Fallback to current directory during dev
+    let fallback = std::env::current_dir().unwrap_or_default().join("models");
+    let _ = fs::create_dir_all(&fallback);
+    fallback
 }
 
 fn resolve_model_path(app: &tauri::AppHandle, model_id: &str) -> Option<std::path::PathBuf> {
