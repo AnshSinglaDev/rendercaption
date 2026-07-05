@@ -43,10 +43,8 @@ jobs:
           # 2. Mock the Vulkan CLI (not used by default on this action but required by tauri.conf)
           cp parakeet-cli-x86_64-unknown-linux-gnu parakeet-cli-vulkan-x86_64-unknown-linux-gnu
 
-          # 3. Download static Linux FFmpeg using curl (to avoid wget 415 errors from this server)
-          curl -L -A "Mozilla/5.0" -o ffmpeg-release-amd64-static.tar.xz https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
-          tar xvf ffmpeg-release-amd64-static.tar.xz
-          cp ffmpeg-*-amd64-static/ffmpeg ffmpeg-x86_64-unknown-linux-gnu
+          # 3. Download static Linux FFmpeg from a reliable GitHub mirror
+          curl -L -o ffmpeg-x86_64-unknown-linux-gnu https://github.com/eugeneware/ffmpeg-static/releases/latest/download/linux-x64
           chmod +x ffmpeg-x86_64-unknown-linux-gnu
 
           # 4. Create dummy .dll files so Tauri doesn't crash when reading the 'resources' block
