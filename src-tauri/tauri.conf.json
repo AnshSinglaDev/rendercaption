@@ -45,7 +45,10 @@
       "bin/ggml-base.dll",
       "bin/ggml-cpu.dll",
       "bin/ggml-cuda.dll",
-      "bin/ggml-vulkan.dll"
+      "bin/ggml-vulkan.dll",
+      "bin/libggml-base.so*",
+      "bin/libggml-cpu.so*",
+      "bin/libggml-cuda.so*"
     ],
     "externalBin": [
       "bin/parakeet-cli",
